@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Blobtools by DRL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Blobtools</h1>
+      <h2 class="project-tagline">Visualisation of (draft) genome assemblies</h2>
+      <a href="https://github.com/DRL/blobtools" class="btn">View on GitHub</a>
+      <a href="https://github.com/DRL/blobtools/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/DRL/blobtools/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <blockquote>
+<p>Once we were blobs in the sea...</p>
+
+<p>-Terry Pratchett, A Hat Full of Sky</p>
+</blockquote>
+
+<h1>
+<a id="blobtools" class="anchor" href="#blobtools" aria-hidden="true"><span class="octicon octicon-link"></span></a>blobtools</h1>
+
+<p>Application for the visualisation of (draft) genome assemblies using TAGC (Taxon-annotated Gc-Coverage) plots <a href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3843372/pdf/fgene-04-00237.pdf">Kumar et al. 2012</a>.</p>
+
+<h2>
+<a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Requirements</h2>
+
+<ul>
+<li>Python 2.7+</li>
+<li>Matplotlib 1.5 </li>
+<li>Docopt </li>
+<li>NCBI Taxonomy (names.dmp and nodes.dmp), ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz</li>
+<li>Virtualenv (recommended), see <a href="http://docs.python-guide.org/en/latest/dev/virtualenvs/">Tutorial</a>
+</li>
+</ul>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<ul>
+<li>Recommended </li>
+</ul>
+
+<pre><code># install virtualenv 
+pip install virtualenv
+
+# clone blobtools into folder
+git clone https://github.com/DRL/blobtools.git
+
+# create virtual environment for blobtools  
+cd blobtools/
+virtualenv blob_env
+
+# activate virtual environment
+source blob_env/bin/activate
+
+# install matplotlib
+(blob_env) $ pip install matplotlib
+
+# install docopt
+(blob_env) $ pip install docopt 
+
+# run
+(blob_env) $ ./blobtools -h
+</code></pre>
+
+<ul>
+<li>Basic</li>
+</ul>
+
+<pre><code># clone blobtools into folder
+$ git clone https://github.com/DRL/blobtools.git
+
+# install matplotlib
+$ pip install matplotlib
+
+# install docopt
+$ pip install docopt
+
+# run
+$ ./blobtools -h
+</code></pre>
+
+<h2>
+<a id="doc" class="anchor" href="#doc" aria-hidden="true"><span class="octicon octicon-link"></span></a>Doc</h2>
+
+<h3>
+<a id="blobtools-1" class="anchor" href="#blobtools-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>blobtools</h3>
+
+<ul>
+<li>main executable</li>
+</ul>
+
+<pre><code>usage: blobtools &lt;command&gt; [&lt;args&gt;...] [--help]
+
+commands:
+  create    create a BlobDB
+  view      print BlobDB
+  plot      plot BlobDB as a blobplot
+
+-h --help    show this
+</code></pre>
+
+<h3>
+<a id="blobtools-create" class="anchor" href="#blobtools-create" aria-hidden="true"><span class="octicon octicon-link"></span></a>blobtools create</h3>
+
+<ul>
+<li>create a BlobDb JSON file</li>
+</ul>
+
+<pre><code>usage: blobtools create     -i FASTA [-y FASTATYPE] [-o OUTFILE] [--title TITLE]
+                              [-b BAM...] [-s SAM...] [-a CAS...] [-c COV...]  
+                              [--nodes &lt;NODES&gt;] [--names &lt;NAMES&gt;] [--db &lt;NODESDB&gt;] 
+                              [-t TAX...] [-r TAXRULE...]
+                              [-h|--help] 
+
+    Options:
+        -h --help                   show this
+        -i, --infile FASTA          FASTA file of assembly. Headers are split at whitespaces.  
+        -y, --type FASTATYPE        Assembly program used to create FASTA. If specified, 
+                                    coverage will be parsed from FASTA header. 
+                                    (Parsing supported for 'spades', 'soap', 'velvet', 'abyss')
+        -t, --taxfile TAX...        Taxonomy file in format (qseqid\ttaxid\tbitscore) 
+                                    (e.g. BLAST output "--outfmt '6 qseqid staxids bitscore'")
+        -r, --taxrule &lt;TAXRULE&gt;...  Taxrule determines how taxonomy of blobs is computed [default: bestsum]
+                                    "bestsum"       : sum bitscore across all hits for each taxonomic rank
+                                    "bestsumorder"  : sum bitscore across all hits for each taxonomic rank. 
+                                                  - If first &lt;TAX&gt; file supplies hits, bestsum is calculated. 
+                                                  - If no hit is found, the next &lt;TAX&gt; file is used.                                 
+        --nodes &lt;NODES&gt;             NCBI nodes.dmp file. Not required if '--db'
+        --names &lt;NAMES&gt;             NCBI names.dmp file. Not required if '--db' 
+        --db &lt;NODESDB&gt;              NodesDB file [default: data/nodesDB.txt]. 
+        -b, --bam &lt;BAM&gt;...          BAM file (requires samtools in $PATH)
+        -s, --sam &lt;SAM&gt;...          SAM file
+        -a, --cas &lt;CAS&gt;...          CAS file (requires clc_mapping_info in $PATH)
+        -c, --cov &lt;COV&gt;...          TAB separated. (seqID\tcoverage)
+        -o, --out &lt;OUT&gt;             BlobDB output prefix 
+        --title TITLE               Title of BlobDB [default: FASTA) 
+</code></pre>
+
+<h3>
+<a id="blobtools-view" class="anchor" href="#blobtools-view" aria-hidden="true"><span class="octicon octicon-link"></span></a>blobtools view</h3>
+
+<ul>
+<li>generate table output from a blobDB file</li>
+</ul>
+
+<pre><code>usage: blobtools view    -i &lt;BLOBDB&gt; [-r &lt;TAXRULE&gt;] [--rank &lt;TAXRANK&gt;...] [--hits]
+                            [--list &lt;LIST&gt;] [--out &lt;OUT&gt;]
+                            [--h|--help] 
+
+    Options:
+        --h --help                  show this
+        -i, --input &lt;BLOBDB&gt;        BlobDB file (created with "blobtools forge")
+        -o, --out &lt;OUT&gt;             Output file [default: STDOUT]
+        -l, --list &lt;LIST&gt;           List of sequence names (comma-separated or file). 
+                                    If comma-separated, no whitespaces allowed.
+        -r, --taxrule &lt;TAXRULE&gt;     Taxrule used for computing taxonomy (supported: "bestsum", "bestsumorder")
+                                    [default: bestsum]
+        --rank &lt;TAXRANK&gt;...         Taxonomic rank(s) at which output will be written. 
+                                    (supported: 'species', 'genus', 'family', 'order', 
+                                    'phylum', 'superkingdom', 'all') [default: phylum]
+        -b, --hits                  Displays taxonomic hits from tax files
+</code></pre>
+
+<h3>
+<a id="blobtools-plot" class="anchor" href="#blobtools-plot" aria-hidden="true"><span class="octicon octicon-link"></span></a>blobtools plot</h3>
+
+<ul>
+<li>generate a blobplot from a blobDB file</li>
+</ul>
+
+<pre><code>usage: blobtools plot    -i BLOBDB [-p INT] [-l INT] [-c] [-n] [-s]
+                            [-r RANK] [-x TAXRULE] [--label GROUPS...] 
+                            [-o PREFIX] [-m] [--sort ORDER] [--hist HIST] [--title]
+                            [--colours FILE] [--include FILE] [--exclude FILE]
+                            [--format FORMAT] [--noblobs] [--noreads] [--refcov FILE]
+                            [-h|--help] 
+
+    Options:
+        -h --help                   show this
+        -i, --infile BLOBDB         BlobDB file
+        -p, --plotgroups INT        Number of (taxonomic) groups to plot, remaining 
+                                     groups are placed in 'other' [default: 7]
+        -l, --length INT            Minimum sequence length considered for plotting [default: 100]
+        -c, --cindex                Colour blobs by 'c index' [default: False]
+        -n, --nohit                 Hide sequences without taxonomic annotation [default: False]
+        -s, --noscale               Do not scale sequences by length [default: False]
+        -o, --out PREFIX            Output prefix
+        -m, --multiplot             Multi-plot. Print plot after addition of each (taxonomic) group 
+                                     [default: False]
+        --sort &lt;ORDER&gt;              Sort order for plotting [default: span]
+                                     span  : plot with decreasing span
+                                     count : plot with decreasing count 
+        --hist &lt;HIST&gt;               Data for histograms [default: span] 
+                                     span  : span-weighted histograms
+                                     count : count histograms
+        --title                     Add title of BlobDB to plot [default: False]
+        -r, --rank RANK             Taxonomic rank used for colouring of blobs [default: phylum]
+                                     (Supported: species, genus, family, order, phylum, superkingdom) 
+        -x, --taxrule TAXRULE       Taxrule which has been used for computing taxonomy 
+                                     (Supported: bestsum, bestsumorder) [default: bestsum]
+        --label GROUPS...           Relabel (taxonomic) groups (not 'all' or 'other'), 
+                                     e.g. "Bacteria=Actinobacteria,Proteobacteria"
+        --colours COLOURFILE        File containing colours for (taxonomic) groups
+        --exclude GROUPS..          Place these (taxonomic) groups in 'other',
+                                     e.g. "Actinobacteria,Proteobacteria"
+        --format FORMAT             Figure format for plot (png, pdf, eps, jpeg, 
+                                        ps, svg, svgz, tiff) [default: png]
+        --noblobs                   Omit blobplot [default: False]
+        --noreads                   Omit plot of reads mapping [default: False]
+        --refcov FILE               File containing number of "total" and "mapped" reads 
+                                    per coverage file. (e.g.: bam0,900,100). If provided, info
+                                    will be used in read coverage plot(s). 
+</code></pre>
+
+<h2>
+<a id="additional-features" class="anchor" href="#additional-features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Additional features</h2>
+
+<h3>
+<a id="blobtools-bam2cov" class="anchor" href="#blobtools-bam2cov" aria-hidden="true"><span class="octicon octicon-link"></span></a>blobtools bam2cov</h3>
+
+<ul>
+<li>extract base-coverage for each contig from BAM file</li>
+</ul>
+
+<pre><code>usage: blobtools bam2cov         -i FASTA -b BAM [-h|--help] 
+
+    Options:
+        -h --help                   show this
+        -i, --infile FASTA          FASTA file of assembly. Headers are split at whitespaces.  
+        -b, --bam &lt;BAM&gt;             BAM file (requires samtools in $PATH)
+</code></pre>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/DRL/blobtools">Blobtools</a> is maintained by <a href="https://github.com/DRL">DRL</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
