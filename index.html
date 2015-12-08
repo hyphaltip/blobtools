@@ -244,6 +244,21 @@ commands:
 <a id="tips--tricks" class="anchor" href="#tips--tricks" aria-hidden="true"><span class="octicon octicon-link"></span></a>Tips &amp; Tricks</h2>
 
 <ul>
+<li>Recommended BLASTn search against NCBI nt</li>
+</ul>
+
+<pre><code>blastn \
+-task megablast \
+-query assmebly.fna \
+-db nt \
+-outfmt '6 qseqid staxids bitscore std sscinames sskingdoms stitle' \
+-culling_limit 5 \
+-num_threads 62 \
+-evalue 1e-25 \
+-out assembly.vs.nt.cul5.1e25.megablast.out
+</code></pre>
+
+<ul>
 <li>converting <a href="https://github.com/bbuchfink/diamond/">Diamond</a> blastx output for use in 'blobtools create' : <a href="https://github.com/GDKO/CGP-scripts/blob/master/scripts/daa_to_tagc.pl">daa_to_tagc.pl</a>
 </li>
 </ul>
