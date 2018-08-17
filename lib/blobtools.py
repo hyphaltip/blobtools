@@ -35,7 +35,7 @@ examples:
 
 """
 
-from __future__ import division
+
 import sys
 from subprocess import call
 import os

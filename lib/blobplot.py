@@ -60,7 +60,7 @@
 
 """
 
-from __future__ import division
+
 from docopt import docopt
 
 from os.path import basename, isfile, join, dirname, abspath
@@ -113,13 +113,13 @@ def main():
     colour_dict = BtIO.parseColours(colour_f)
 
     # Load BlobDb
-    print BtLog.status_d['9'] % blobdb_f
+    print(BtLog.status_d['9'] % blobdb_f)
     blobDb = BtCore.BlobDb('blobplot')
     blobDb.version = blobtools.__version__
     blobDb.load(blobdb_f)
 
     # Generate plot data
-    print BtLog.status_d['18']
+    print(BtLog.status_d['18'])
     data_dict, min_cov, max_cov, cov_lib_dict = blobDb.getPlotData(rank, min_length, hide_nohits, taxrule, c_index, catcolour_dict)
     plotObj = BtPlot.PlotObj(data_dict, cov_lib_dict, cov_lib_selection, 'blobplot', sort_first)
     plotObj.exclude_groups = exclude_groups
@@ -140,7 +140,7 @@ def main():
     plotObj.labels.update(plotObj.group_order)
     # plotObj.group_labels is dict that contains labels for each group : all/other/user_label
     if (user_labels):
-        for group, label in user_labels.items():
+        for group, label in list(user_labels.items()):
             plotObj.labels.add(label)
     plotObj.group_labels = {group : set() for group in plotObj.group_order}
     plotObj.relabel_and_colour(colour_dict, user_labels)
@@ -164,7 +164,7 @@ def main():
         if exclude_groups:
             out_f = "%s.%s" % (out_f, "exclude_" + "_".join(exclude_groups))
         if labels:
-            out_f = "%s.%s" % (out_f, "userlabel_" + "_".join(set([name for name in user_labels.values()])))
+            out_f = "%s.%s" % (out_f, "userlabel_" + "_".join(set([name for name in list(user_labels.values())])))
         out_f = "%s.%s" % (out_f, "blobplot")
         if (plotObj.cumulative_flag):
             out_f = "%s.%s" % (out_f, "cumulative")

@@ -6,7 +6,7 @@ File        : BtTax.py
 Author      : Dominik R. Laetsch, dominik.laetsch at gmail dot com
 """
 
-from __future__ import division
+
 RANKS = ['species', 'genus', 'family', 'order', 'phylum', 'superkingdom']
 TAXRULES = ['bestsum', 'bestsumorder'] # this should be re-named colour rules at one point
 
@@ -32,7 +32,7 @@ def getTreeList(taxIds, nodesDB):
 
 def getLineages(tree_lists, nodesDB):
     lineage = {}
-    for tree_list_id, tree_list in tree_lists.items():
+    for tree_list_id, tree_list in list(tree_lists.items()):
         lineage[tree_list_id] = {rank : 'undef' for rank in RANKS}
         for taxId in tree_list:
             node = nodesDB[taxId]
@@ -55,7 +55,7 @@ def taxRuleBestSum(taxDict, taxonomy, min_bitscore, min_bitscore_diff, tax_colli
             for tax, score in sorted(taxDict[lib][rank].items()):
                 tempTax[rank][tax] = tempTax[rank].get(tax, 0.0) + score
     for rank in tempTax:
-        for tax, score in sorted(tempTax[rank].items(), key=lambda x: x[1], reverse=True):
+        for tax, score in sorted(list(tempTax[rank].items()), key=lambda x: x[1], reverse=True):
             if taxonomy[rank]['tax'] == 'no-hit':
                 taxonomy[rank]['score'] = score
                 if score >= min_bitscore:
@@ -77,7 +77,7 @@ def taxRuleBestSumOrder(taxDict, taxonomy, min_bitscore, min_bitscore_diff, tax_
     for rank in RANKS:
         taxonomy_assigned_in_hit_lib = ''
         for lib in sorted(taxDict):
-            for tax, score in sorted(taxDict[lib][rank].items(), key=lambda x: x[1], reverse=True):
+            for tax, score in sorted(list(taxDict[lib][rank].items()), key=lambda x: x[1], reverse=True):
                 if not taxonomy_assigned_in_hit_lib:  # has not been taxonomically annotated yet
                     if taxonomy[rank]['tax'] == 'no-hit':
                         taxonomy[rank]['score'] = score
@@ -111,7 +111,7 @@ def taxRule(taxrule, hits, lineages, min_score, min_bitscore_diff, tax_collision
 
 def getTaxDict(hits, lineages):
     taxDict = {}
-    for lib, hits in hits.items():
+    for lib, hits in list(hits.items()):
         taxDict[lib] = {}
         for hit in hits:
             taxId = hit['taxId']

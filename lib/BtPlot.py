@@ -6,7 +6,7 @@ File        : BtPlot.py
 Author      : Dominik R. Laetsch, dominik.laetsch at gmail dot com
 """
 
-from __future__ import division
+
 from numpy import array, arange, logspace, mean, std
 import math
 import lib.BtLog as BtLog
@@ -19,7 +19,7 @@ from matplotlib.lines import Line2D
 from matplotlib.colors import rgb2hex
 mat.use('agg')
 import matplotlib.pyplot as plt
-from itertools import izip
+
 
 mat.rcParams.update({'font.size': 36})
 mat.rcParams['xtick.major.pad'] = '8'
@@ -28,7 +28,7 @@ mat.rcParams['lines.antialiased'] = True
 
 LEGEND_FONTSIZE = 20
 COLOURMAP = "Spectral" # "Set1", "Paired", "Set2", "Spectral"
-BLACK, GREY, BGGREY, WHITE, DGREY = unicode('#262626'), unicode('#d3d3d3'), unicode('#F0F0F5'), unicode('#ffffff'), unicode('#4d4d4d')
+BLACK, GREY, BGGREY, WHITE, DGREY = str('#262626'), str('#d3d3d3'), str('#F0F0F5'), str('#ffffff'), str('#4d4d4d')
 nullfmt = NullFormatter()
 
 def n50(list_of_lengths):
@@ -72,7 +72,7 @@ def generateColourDict(groups):
     colour_groups = [group for group in groups if not group == 'no-hit' or not group == 'None']
     n_tax = len(colour_groups)
     breaks = [0.0 + x*(1.0-0.0)/n_tax for x in range(n_tax)]
-    colour_d = {group: rgb2hex(cmap(b)) for b, group in izip(breaks, colour_groups)}
+    colour_d = {group: rgb2hex(cmap(b)) for b, group in zip(breaks, colour_groups)}
     if 'no-hit' in groups:
         colour_d['no-hit'] = GREY
     if 'None' in groups:
@@ -161,7 +161,7 @@ def plot_legend(fig, axLegend, out_f, legend_flag, format, cumulative_flag):
     if (legend_flag):
         extent = axLegend.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
         legend_out_f = '%s.%s.%s' % (out_f, "legend", format)
-        print BtLog.status_d['8'] % legend_out_f
+        print(BtLog.status_d['8'] % legend_out_f)
         fig.savefig('%s' % legend_out_f, bbox_inches=extent, format=format)
         fig.delaxes(axLegend)
     return fig
@@ -266,7 +266,7 @@ class PlotObj():
                 if not cov_lib_selection in cov_lib_dict:
                     cov_lib_selection_error = 1
         else:
-            selected_cov_libs = cov_lib_dict.keys()
+            selected_cov_libs = list(cov_lib_dict.keys())
         if cov_lib_selection_error:
             covlib_string = []
             for covlib in cov_lib_dict:
@@ -295,10 +295,10 @@ class PlotObj():
                   'n50' : "{:,}".format(self.stats[group]['n50']),
                   'gc_mean' : "{0:.2}".format(self.stats[group]['gc_mean']),
                   'gc_std' : "{0:.2}".format(self.stats[group]['gc_std']),
-                  'cov_mean' : {cov_lib : "{0:0.1f}".format(cov_mean) for cov_lib, cov_mean in self.stats[group]['cov_mean'].items()},
-                  'cov_std' : {cov_lib : "{0:0.1f}".format(cov_std) for cov_lib, cov_std in self.stats[group]['cov_std'].items()},
-                  'reads_mapped' : {cov_lib : "{:,}".format(reads_mapped) for cov_lib, reads_mapped in self.stats[group]['reads_mapped'].items()},
-                  'reads_mapped_perc' : {cov_lib : '{0:.1%}'.format(reads_mapped_perc) for cov_lib, reads_mapped_perc in self.stats[group]['reads_mapped_perc'].items()}
+                  'cov_mean' : {cov_lib : "{0:0.1f}".format(cov_mean) for cov_lib, cov_mean in list(self.stats[group]['cov_mean'].items())},
+                  'cov_std' : {cov_lib : "{0:0.1f}".format(cov_std) for cov_lib, cov_std in list(self.stats[group]['cov_std'].items())},
+                  'reads_mapped' : {cov_lib : "{:,}".format(reads_mapped) for cov_lib, reads_mapped in list(self.stats[group]['reads_mapped'].items())},
+                  'reads_mapped_perc' : {cov_lib : '{0:.1%}'.format(reads_mapped_perc) for cov_lib, reads_mapped_perc in list(self.stats[group]['reads_mapped_perc'].items())}
                 }
         return stats
 
@@ -309,12 +309,12 @@ class PlotObj():
             stats.append(self.get_stats_for_group(group))
             if not group in self.group_labels: # it is either a label or "other"
                 label = group
-                for g, labels in self.group_labels.items():
+                for g, labels in list(self.group_labels.items()):
                     if label in labels:
                         stats.append(self.get_stats_for_group(g))
         output = []
         output.append('## %s' % self.version)
-        for cov_lib, cov_lib_dict in self.cov_lib_dict.items():
+        for cov_lib, cov_lib_dict in list(self.cov_lib_dict.items()):
            if cov_lib in self.cov_libs:
                 output.append("## %s=%s" % (cov_lib, cov_lib_dict['f']))
         fields = ['name', 'colour', 'count_visible', 'count_visible_perc', 'span_visible','span_visible_perc', 'n50', 'gc_mean', 'gc_std']
@@ -337,7 +337,7 @@ class PlotObj():
             output.append("%s" % "\t".join(line))
         out_f = "%s.stats.txt" % out_f
         with open(out_f, 'w') as fh:
-            print BtLog.status_d['24'] % ("%s" % out_f)
+            print(BtLog.status_d['24'] % ("%s" % out_f))
             fh.write("\n".join(output))
 
     def compute_stats(self):
@@ -364,7 +364,7 @@ class PlotObj():
                             'span_hidden' : 0
                             }
 
-        for group, labels in self.group_labels.items():
+        for group, labels in list(self.group_labels.items()):
             for label in labels:
                 stats[label]['name'] = stats[label]['name'] + self.data_dict[group]['name']
                 stats[label]['groups'].add(group)
@@ -587,7 +587,7 @@ class PlotObj():
         ax_group.set_xticklabels(ax_group_data['labels'], rotation=45, ha='center', fontsize=LEGEND_FONTSIZE)
         #figsuptitle = fig.suptitle(out_f, verticalalignment='top')
         out_f = "%s.read_cov.%s" % (out_f, cov_lib)
-        print BtLog.status_d['8'] % "%s.%s" % (out_f, self.format)
+        print(BtLog.status_d['8'] % "%s.%s" % (out_f, self.format))
         fig.tight_layout()
         #fig.savefig("%s.%s" % (out_f, self.format), format=self.format,  bbox_extra_artists=(figsuptitle,))
         fig.savefig("%s.%s" % (out_f, self.format), format=self.format)
@@ -638,7 +638,7 @@ class PlotObj():
                 fmt_n50 = "{:,}".format(group_n50)
                 label = "%s (%s;%sMB;%snt)" % (group, fmt_seqs, fmt_span, fmt_n50)
                 if (info_flag):
-                    print BtLog.info_d['0'] % (group, fmt_seqs, fmt_span, fmt_n50)
+                    print(BtLog.info_d['0'] % (group, fmt_seqs, fmt_span, fmt_n50))
                 legend_handles.append(Line2D([0], [0], linewidth = 0.5, linestyle="none", marker="o", alpha=1, markersize=24, markeredgecolor=BLACK, markerfacecolor=colour))
                 legend_labels.append(label)
 
@@ -664,7 +664,7 @@ class PlotObj():
                     plot_ref_legend(axScatter_m, max_length, max_marker_size, self.ignore_contig_length)
                     m_out_f = "%s.%s.%s.%s" % (out_f, cov_lib, idx, group.replace("/", "_").replace(" ", "_"))
                     fig_m = plot_legend(fig_m, axLegend_m, m_out_f, self.legend_flag, self.format, self.cumulative_flag)
-                    print BtLog.status_d['8'] % "%s.%s" % (m_out_f, self.format)
+                    print(BtLog.status_d['8'] % "%s.%s" % (m_out_f, self.format))
                     fig_m.savefig("%s.%s" % (m_out_f, self.format), format=self.format)
                     plt.close(fig_m)
                 elif (self.cumulative_flag):
@@ -675,7 +675,7 @@ class PlotObj():
                     fig = plot_legend(fig, axLegend, m_out_f, self.legend_flag, self.format, self.cumulative_flag)
                     if not (self.no_title):
                         fig.suptitle(out_f, fontsize=35, verticalalignment='top')
-                    print BtLog.status_d['8'] % "%s.%s" % (m_out_f, self.format)
+                    print(BtLog.status_d['8'] % "%s.%s" % (m_out_f, self.format))
                     fig.savefig("%s.%s" % (m_out_f, self.format), format=self.format)
                 else:
                     pass
@@ -686,7 +686,7 @@ class PlotObj():
         fig = plot_legend(fig, axLegend, out_f, self.legend_flag, self.format, self.cumulative_flag)
         if not (self.no_title):
             fig.suptitle(out_f, fontsize=35, verticalalignment='top')
-        print BtLog.status_d['8'] % "%s.%s" % (out_f, self.format)
+        print(BtLog.status_d['8'] % "%s.%s" % (out_f, self.format))
         fig.savefig("%s.%s" % (out_f, self.format), format=self.format)
         plt.close(fig)
 
