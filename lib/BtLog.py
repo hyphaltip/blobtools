@@ -22,13 +22,13 @@ def progress(iteration, steps, max_value, no_limit=False):
     elif int(iteration) == max_value:
         if no_limit == True:
             sys.stdout.write('\r')
-            print "[%%] \t%d%%" % (100),
+            print("[%%] \t%d%%" % (100),)
         else:
             sys.stdout.write('\r')
-            print "[%%] \t%d%%" % (100)
+            print("[%%] \t%d%%" % (100))
     elif int(iteration) % steps == 0:
         sys.stdout.write('\r')
-        print "[%%] \t%d%%" % (float(int(iteration) / int(max_value)) * 100),
+        print("[%%] \t%d%%" % (float(int(iteration) / int(max_value)) * 100),)
         sys.stdout.flush()
     else:
         pass
